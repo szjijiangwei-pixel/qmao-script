@@ -1,4 +1,4 @@
-// 七猫小说去广告 + VIP解锁 (Shadowrocket优化版)
+// 七猫小说 去广告优化版 (Shadowrocket)
 if (!$response || !$request) $done({});
 
 let body = $response.body;
@@ -7,38 +7,39 @@ const url = $request.url;
 try {
     let obj = JSON.parse(body);
 
-    // VIP解锁
-    if (url.includes('user') || url.includes('vip') || url.includes('profile')) {
-        if (obj.data) {
-            obj.data.is_vip = 1;
-            obj.data.isLifetimeVip = 1;
-            obj.data.year_vip_show = 1;
-            obj.data.vip_privilege_desc = "终身VIP · 无广告";
-        }
-    }
+    // ==================== 重点广告清理 ====================
 
-    // 阅读页广告清理
-    if (url.includes('reader-adv') || url.includes('chapter') || url.includes('content')) {
+    // 阅读页各种广告
+    if (url.includes('reader-adv') || url.includes('chapter') || url.includes('content') || url.includes('read')) {
         if (obj.data) {
+            // 清空广告数组
             if (obj.data.reader_chapter_list) obj.data.reader_chapter_list = [];
             if (obj.data.reader_bottom_list) obj.data.reader_bottom_list = [];
             if (obj.data.reader_page_turn_list) obj.data.reader_page_turn_list = [];
             if (obj.data.reader_inchapter) obj.data.reader_inchapter = [];
+            if (obj.data.reader_getcoin) obj.data.reader_getcoin = [];
             if (obj.data.list) obj.data.list = [];
         }
     }
 
-    // 书架、首页、广告接口清理
-    if (url.includes('bookshelf') || url.includes('adv') || url.includes('index')) {
+    // 书架、首页、弹窗广告
+    if (url.includes('bookshelf') || url.includes('adv') || url.includes('index') || url.includes('home')) {
         if (obj.data) {
             if (obj.data.list) obj.data.list = [];
             if (obj.data.bookshelf) obj.data.bookshelf = [];
+            if (obj.data.banner) obj.data.banner = [];
         }
     }
 
+    // 其他推广/下载广告
+    if (url.includes('download') || url.includes('coopen') || url.includes('popup')) {
+        if (obj.data && obj.data.list) obj.data.list = [];
+    }
+
     body = JSON.stringify(obj);
+
 } catch (e) {
-    console.log("七猫脚本执行出错: " + e);
+    console.log("七猫去广告脚本出错: " + e);
 }
 
 $done({ body: body });
